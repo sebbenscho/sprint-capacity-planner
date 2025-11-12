@@ -37,80 +37,105 @@
         <!-- Layout wurde auf EINE Spalte (grid-cols-1) umgestellt, um Stapelung zu erzwingen -->
         <div class="grid grid-cols-1 gap-y-6">
             
-            <!-- INPUT SECTION -->
-            <div id="input-section" class="space-y-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
+            <!-- INPUT SECTION - Jetzt mit internem grid grid-cols-2 -->
+            <div id="input-section" class="p-4 bg-gray-50 rounded-xl border border-gray-100">
                 <h2 class="text-xl font-bold text-gray-700 mb-4 border-b pb-2">Variables (Editable)</h2>
                 
-                <div class="flex flex-col">
-                    <label for="inputRollingSPs" class="text-sm font-medium text-gray-700 mb-1">Rolling AVG SPs (Past Velocity)</label>
-                    <input type="number" id="inputRollingSPs" value="22.29" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150">
-                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    
+                    <!-- Working hours per week (Half Width) -->
+                    <div class="flex flex-col">
+                        <label for="inputHoursPerWeek" class="text-sm font-medium text-gray-700 mb-1">Hours/Week</label>
+                        <input type="number" id="inputHoursPerWeek" value="38.5" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150">
+                    </div>
+                    
+                    <!-- Weeks per sprint (Half Width) -->
+                    <div class="flex flex-col">
+                        <label for="inputWeeksPerSprint" class="text-sm font-medium text-gray-700 mb-1">Weeks/Sprint</label>
+                        <input type="number" id="inputWeeksPerSprint" value="2" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150">
+                    </div>
+                    
+                    <!-- People working in sprint (Half Width) -->
+                    <div class="flex flex-col">
+                        <label for="inputPeopleWorking" class="text-sm font-medium text-gray-700 mb-1">People in Sprint</label>
+                        <input type="number" id="inputPeopleWorking" value="5" step="1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150">
+                    </div>
 
-                <div class="flex flex-col">
-                    <label for="inputHoursPerWeek" class="text-sm font-medium text-gray-700 mb-1">Working hours per week</label>
-                    <input type="number" id="inputHoursPerWeek" value="38.5" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150">
-                </div>
-                
-                <div class="flex flex-col">
-                    <label for="inputWeeksPerSprint" class="text-sm font-medium text-gray-700 mb-1">Weeks per sprint</label>
-                    <input type="number" id="inputWeeksPerSprint" value="2" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150">
-                </div>
-                
-                <div class="flex flex-col">
-                    <label for="inputPeopleWorking" class="text-sm font-medium text-gray-700 mb-1">People working in sprint</label>
-                    <input type="number" id="inputPeopleWorking" value="5" step="1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150">
-                </div>
+                    <!-- Working hours per day (Half Width) -->
+                    <div class="flex flex-col">
+                        <label for="inputHoursPerDay" class="text-sm font-medium text-gray-700 mb-1">Hours/Day</label>
+                        <input type="number" id="inputHoursPerDay" value="7.7" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150">
+                    </div>
 
-                <div class="flex flex-col">
-                    <label for="inputHoursPerDay" class="text-sm font-medium text-gray-700 mb-1">Working hours per day</label>
-                    <input type="number" id="inputHoursPerDay" value="7.7" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150">
-                </div>
-                
-                <div class="flex flex-col">
-                    <label for="inputAbsenceDays" class="text-sm font-medium text-gray-700 mb-1">Total absence days</label>
-                    <input type="number" id="inputAbsenceDays" value="5" step="0.5" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150">
-                </div>
-                
-                <div class="flex flex-col">
-                    <label for="inputBuffer" class="text-sm font-medium text-gray-700 mb-1">Buffer (%) (SRs, Bugs, etc.)</label>
-                    <input type="number" id="inputBuffer" value="20" step="1" min="0" max="100" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150">
+                    <!-- --- Separator for secondary variables --- -->
+                    <div class="col-span-2 pt-4 border-t border-gray-200 mt-2 grid grid-cols-2 gap-4">
+                        
+                        <!-- Total absence days (Half Width) -->
+                        <div class="flex flex-col">
+                            <label for="inputAbsenceDays" class="text-sm font-medium text-gray-700 mb-1">Absence Days</label>
+                            <input type="number" id="inputAbsenceDays" value="5" step="0.5" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150">
+                        </div>
+                        
+                        <!-- Buffer (%) (Half Width) -->
+                        <div class="flex flex-col">
+                            <label for="inputBuffer" class="text-sm font-medium text-gray-700 mb-1">Buffer (%)</label>
+                            <input type="number" id="inputBuffer" value="20" step="1" min="0" max="100" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150">
+                        </div>
+                        
+                        <!-- Rolling AVG SPs (Full Width) - MOVED TO BOTTOM -->
+                        <div class="flex flex-col col-span-2 mt-2">
+                            <label for="inputRollingSPs" class="text-sm font-medium text-gray-700 mb-1">Rolling AVG SPs (Past Velocity)</label>
+                            <input type="number" id="inputRollingSPs" value="22.29" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150">
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- RESULTS SECTION -->
+            <!-- RESULTS SECTION - Jetzt mit internem grid grid-cols-2 für Zwischenergebnisse -->
             <div id="results-section" class="space-y-4">
                 <h2 class="text-xl font-bold text-gray-700 mb-4 border-b pb-2">Results (Protected)</h2>
                 
-                <div class="p-4 rounded-xl result-field">
-                    <div class="text-sm text-gray-500">Hours per sprint (Total)</div>
-                    <div id="outputHoursPerSprint" class="text-xl font-bold tracking-tight text-gray-800"></div>
-                </div>
+                <!-- Grid für Zwischenergebnisse -->
+                <div class="grid grid-cols-2 gap-4">
+                    
+                    <!-- BASE CAPACITY METRICS -->
+                    <div class="p-4 rounded-xl result-field">
+                        <div class="text-sm text-gray-500">Hours/Sprint</div>
+                        <div id="outputHoursPerSprint" class="text-xl font-bold tracking-tight text-gray-800"></div>
+                    </div>
+    
+                    <div class="p-4 rounded-xl result-field">
+                        <div class="text-sm text-gray-500">100% Capacity</div>
+                        <div id="outputHoursOf100Capacity" class="text-xl font-bold tracking-tight text-gray-800"></div>
+                    </div>
+                    
+                    <!-- SEPARATOR LINE HERE -->
+                    <div class="col-span-2 border-t border-gray-300 my-2"></div>
+                    <!-- END SEPARATOR LINE -->
 
-                <div class="p-4 rounded-xl result-field">
-                    <div class="text-sm text-gray-500">Hours of 100% capacity</div>
-                    <div id="outputHoursOf100Capacity" class="text-xl font-bold tracking-tight text-gray-800"></div>
+                    <!-- ADJUSTED CAPACITY METRICS -->
+                    <div class="p-4 rounded-xl result-field">
+                        <div class="text-sm text-gray-500">Absence (hrs)</div>
+                        <div id="outputHoursOfAbsence" class="text-xl font-bold tracking-tight text-gray-800"></div>
+                    </div>
+                    
+                    <div class="p-4 rounded-xl result-field">
+                        <div class="text-sm text-gray-500">Actual Hours</div>
+                        <div id="outputActualHoursPerSprint" class="text-xl font-bold tracking-tight text-gray-800"></div>
+                    </div>
+                    
+                    <div class="p-4 rounded-xl result-field">
+                        <div class="text-sm text-gray-500">Act. Capacity %</div>
+                        <div id="outputCapacityExcludingAbsences" class="text-xl font-bold tracking-tight text-gray-800"></div>
+                    </div>
+                    
+                    <div class="p-4 rounded-xl result-field">
+                        <div class="text-sm text-gray-500">SP Capacity %</div>
+                        <div id="outputBufferSubstracted" class="text-xl font-bold tracking-tight text-gray-800"></div>
+                    </div>
                 </div>
                 
-                <div class="p-4 rounded-xl result-field">
-                    <div class="text-sm text-gray-500">Hours of absence total</div>
-                    <div id="outputHoursOfAbsence" class="text-xl font-bold tracking-tight text-gray-800"></div>
-                </div>
-                
-                <div class="p-4 rounded-xl result-field">
-                    <div class="text-sm text-gray-500">Actual hours per sprint</div>
-                    <div id="outputActualHoursPerSprint" class="text-xl font-bold tracking-tight text-gray-800"></div>
-                </div>
-                
-                <div class="p-4 rounded-xl result-field">
-                    <div class="text-sm text-gray-500">Capacity excluding absences</div>
-                    <div id="outputCapacityExcludingAbsences" class="text-xl font-bold tracking-tight text-gray-800"></div>
-                </div>
-                
-                <div class="p-4 rounded-xl result-field">
-                    <div class="text-sm text-gray-500">Effective Capacity Multiplier (100% - Buffer)</div>
-                    <div id="outputBufferSubstracted" class="text-xl font-bold tracking-tight text-gray-800"></div>
-                </div>
-                
+                <!-- Endergebnis (Highlight) bleibt in voller Breite -->
                 <div class="p-4 rounded-xl highlight-field">
                     <div class="text-sm text-indigo-200">Actual SPs per sprint</div>
                     <div id="outputActualSPsPerSprint" class="text-2xl font-extrabold tracking-tight text-white"></div>
@@ -142,7 +167,7 @@
             const aD = safeParseFloat('inputAbsenceDays');
             const b = safeParseFloat('inputBuffer');
 
-            // --- 2. Calculations (Based on React Logic) ---
+            // --- 2. Calculations (Updated Logic for SP Capacity %) ---
             
             // 1. Hours per sprint (Total team hours per sprint)
             const hoursPerSprint = wHPW * wPS;
@@ -156,22 +181,32 @@
             // 4. Actual hours per sprint (Capacity - Absence)
             const actualHoursPerSprint = hoursOf100Capacity - hoursOfAbsence;
             
-            // 5. Capacity excluding absences (%)
+            // 5. Actual Capacity % (Capacity excluding absences)
             const capacityExcludingAbsences = safeDivide(actualHoursPerSprint, hoursOf100Capacity) * 100;
 
-            // 6. Buffer multiplier
-            const bufferSubstracted = safeDivide((100 - b), 100);
+            // 6. Buffer multiplier (e.g., 1 - 0.20 = 0.80)
+            const bufferMultiplier = safeDivide((100 - b), 100);
             
-            // 7. Actual SPs per sprint (The estimated outcome)
-            const actualSPsPerSprint = rSPs * safeDivide(capacityExcludingAbsences, 100) * bufferSubstracted;
+            // 7. SP Capacity % (Actual Capacity % * Buffer Multiplier)
+            const spCapacityPercentage = capacityExcludingAbsences * bufferMultiplier;
+
+            // 8. Actual SPs per sprint (The estimated outcome)
+            // Uses the newly calculated SP Capacity % directly
+            const actualSPsPerSprint = rSPs * safeDivide(spCapacityPercentage, 100);
 
             // --- 3. Update Results in UI ---
             document.getElementById('outputHoursPerSprint').textContent = hoursPerSprint.toFixed(2) + ' hrs';
             document.getElementById('outputHoursOf100Capacity').textContent = hoursOf100Capacity.toFixed(2) + ' hrs';
             document.getElementById('outputHoursOfAbsence').textContent = hoursOfAbsence.toFixed(2) + ' hrs';
             document.getElementById('outputActualHoursPerSprint').textContent = actualHoursPerSprint.toFixed(2) + ' hrs';
+            
+            // Actual Capacity %
             document.getElementById('outputCapacityExcludingAbsences').textContent = capacityExcludingAbsences.toFixed(2) + '%';
-            document.getElementById('outputBufferSubstracted').textContent = (bufferSubstracted * 100).toFixed(2) + '%';
+            
+            // SP Capacity % (Now calculated as Actual Capacity * (1 - Buffer))
+            document.getElementById('outputBufferSubstracted').textContent = spCapacityPercentage.toFixed(2) + '%';
+            
+            // Actual SPs per sprint (Using the new SP Capacity %)
             document.getElementById('outputActualSPsPerSprint').textContent = actualSPsPerSprint.toFixed(2);
         }
 
