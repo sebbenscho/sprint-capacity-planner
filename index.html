@@ -1,325 +1,153 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sprint Capacity Planner</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Custom font and base styles */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0d1117; /* Dark background */
-        }
-        /* Custom styling for read-only fields (the "Protected" cells) */
-        .protected-field {
-            background-color: #1a202c; /* Darker grey background */
-            color: #48bb78; /* Green text for visibility */
-            font-weight: 700;
-            border: 2px solid #2d3748;
-        }
-        /* Styling for editable input fields */
-        .editable-field {
-            background-color: #2d3748; /* Medium grey background */
-            color: #cbd5e0;
-            border: 2px solid #4a5568;
-        }
-    </style>
-    <!-- Firebase Imports for Real-time Collaboration -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import React, { useState } from 'react';
+import { Calculator } from 'lucide-react';
 
-        // Expose Firebase objects globally within the script scope for use in the main script
-        window.FirebaseServices = { initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, getFirestore, doc, setDoc, onSnapshot, setLogLevel };
-    </script>
-</head>
-<body class="p-4 md:p-8 min-h-screen flex items-center justify-center">
+export default function SprintCapacityPlanner() {
+  const [rollingSPs, setRollingSPs] = useState('22.29');
+  const [workingHoursPerWeek, setWorkingHoursPerWeek] = useState('38.5');
+  const [weeksPerSprint, setWeeksPerSprint] = useState('2');
+  const [peopleWorking, setPeopleWorking] = useState('5');
+  const [workingHoursPerDay, setWorkingHoursPerDay] = useState('7.7');
+  const [absenceDays, setAbsenceDays] = useState('5');
+  const [buffer, setBuffer] = useState('20');
 
-    <div class="w-full max-w-2xl bg-gray-800 p-6 rounded-xl shadow-2xl">
-        <h1 class="text-3xl font-extrabold text-white mb-2 tracking-tight">Sprint capacity planner</h1>
-        <p class="text-gray-400 mb-4">Enter your variables below to calculate the Story Points for the Sprint</p>
-        
-        <!-- Container for Input Fields (Editable) -->
-        <div id="input-section" class="mb-8 border-b border-gray-700 pb-4">
-            <h2 class="text-xl font-semibold text-sky-400 mb-4">Inputs (Editable)</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                
-                <!-- Working hours per week -->
-                <div class="flex flex-col">
-                    <label for="inputHoursPerWeek" class="text-sm font-medium text-gray-300 mb-1">Working hours per week</label>
-                    <input type="number" id="inputHoursPerWeek" value="38.5" class="editable-field p-3 rounded-lg focus:ring-sky-500 focus:border-sky-500" min="0" step="0.5">
-                </div>
+  // Calculations based on formulas
+  const hoursPerSprint = parseFloat(workingHoursPerWeek) * parseFloat(weeksPerSprint);
+  const hoursOf100Capacity = hoursPerSprint * parseFloat(peopleWorking);
+  const hoursOfAbsence = parseFloat(absenceDays) * parseFloat(workingHoursPerDay);
+  const actualHoursPerSprint = hoursOf100Capacity - hoursOfAbsence;
+  const capacityExcludingAbsences = (actualHoursPerSprint / hoursOf100Capacity) * 100;
+  const bufferSubstracted = (100 - parseFloat(buffer)) / 100;
+  const actualSPsPerSprint = parseFloat(rollingSPs) * (capacityExcludingAbsences / 100) * bufferSubstracted;
 
-                <!-- Weeks per sprint -->
-                <div class="flex flex-col">
-                    <label for="inputWeeksPerSprint" class="text-sm font-medium text-gray-300 mb-1">Weeks per sprint</label>
-                    <input type="number" id="inputWeeksPerSprint" value="2" class="editable-field p-3 rounded-lg focus:ring-sky-500 focus:border-sky-500" min="0.1" step="0.1">
-                </div>
-
-                <!-- People working in sprint -->
-                <div class="flex flex-col">
-                    <label for="inputPeople" class="text-sm font-medium text-gray-300 mb-1">People working in sprint</label>
-                    <input type="number" id="inputPeople" value="5" class="editable-field p-3 rounded-lg focus:ring-sky-500 focus:border-sky-500" min="1" step="1">
-                </div>
-
-                <!-- Hours of absence BE -->
-                <div class="flex flex-col">
-                    <label for="inputAbsence" class="text-sm font-medium text-gray-300 mb-1">Hours of absence BE (Sick, Vacation, etc.)</label>
-                    <input type="number" id="inputAbsence" value="38.5" class="editable-field p-3 rounded-lg focus:ring-sky-500 focus:border-sky-500" min="0" step="0.5">
-                </div>
-
-                <!-- Buffer (Percentage) -->
-                <div class="flex flex-col">
-                    <label for="inputBuffer" class="text-sm font-medium text-gray-300 mb-1">Buffer (SRs, Bugs, Unforeseen) - %</label>
-                    <input type="number" id="inputBuffer" value="20" class="editable-field p-3 rounded-lg focus:ring-sky-500 focus:border-sky-500" min="0" max="100" step="1">
-                </div>
-
-                 <!-- Rolling AVG SPs -->
-                <div class="flex flex-col">
-                    <label for="inputRollingSPs" class="text-sm font-medium text-gray-300 mb-1">Rolling AVG SPs (Past Velocity)</label>
-                    <input type="number" id="inputRollingSPs" value="22" class="editable-field p-3 rounded-lg focus:ring-sky-500 focus:border-sky-500" min="0" step="0.1">
-                </div>
-            </div>
-        </div>
-
-        <!-- Container for Output Fields (Protected/Calculated) -->
-        <div id="output-section">
-            <h2 class="text-xl font-semibold text-green-400 mb-4">Calculations (Protected)</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                <!-- Hours per sprint -->
-                <div class="flex flex-col">
-                    <label class="text-sm font-medium text-gray-300 mb-1">Hours per sprint (Total)</label>
-                    <input type="text" id="outputHoursPerSprint" readonly class="protected-field p-3 rounded-lg">
-                </div>
-
-                <!-- Hours of 100% capacity BE -->
-                <div class="flex flex-col">
-                    <label class="text-sm font-medium text-gray-300 mb-1">Hours of 100% capacity BE</label>
-                    <input type="text" id="outputFullCapacity" readonly class="protected-field p-3 rounded-lg">
-                </div>
-
-                <!-- Actual hours per sprint BE -->
-                <div class="flex flex-col">
-                    <label class="text-sm font-medium text-gray-300 mb-1">Actual hours per sprint BE</label>
-                    <input type="text" id="outputActualHours" readonly class="protected-field p-3 rounded-lg">
-                </div>
-
-                <!-- Capacity excluding absences -->
-                <div class="flex flex-col">
-                    <label class="text-sm font-medium text-gray-300 mb-1">Capacity excluding absences</label>
-                    <input type="text" id="outputCapacityExcludingAbsence" readonly class="protected-field p-3 rounded-lg">
-                </div>
-
-                <!-- SP capacity excluding absences and buffer -->
-                <div class="flex flex-col">
-                    <label class="text-sm font-medium text-gray-300 mb-1">SP capacity excluding buffer</label>
-                    <input type="text" id="outputSPCapacity" readonly class="protected-field p-3 rounded-lg">
-                </div>
-                
-                <!-- Actual SPs per sprint -->
-                <div class="flex flex-col">
-                    <label class="text-lg font-bold text-gray-200 mb-1">Actual SPs per sprint</label>
-                    <input type="text" id="outputActualSPs" readonly class="protected-field p-3 rounded-lg text-xl bg-green-900/50 border-green-500">
-                </div>
-
-            </div>
-            
-            <div id="last-update" class="text-right text-gray-500 text-xs mt-4"></div>
-
-        </div>
-
+  const InputField = ({ label, value, onChange, step = "0.1" }) => (
+    <div className="mb-4">
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        {label}
+      </label>
+      <input
+        type="number"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        step={step}
+        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
     </div>
+  );
 
-    <script type="module">
-        // Ensure FirebaseServices is available from the import block
-        if (typeof window.FirebaseServices === 'undefined') {
-            console.error("Firebase services failed to load.");
-        }
-        const { initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, getFirestore, doc, setDoc, onSnapshot, setLogLevel } = window.FirebaseServices;
+  const ResultField = ({ label, value, isPercentage = false, isHighlight = false }) => (
+    <div className={`mb-3 p-3 rounded ${isHighlight ? 'bg-green-100 border-2 border-green-600' : 'bg-gray-50'}`}>
+      <div className="text-sm text-gray-600">{label}</div>
+      <div className={`text-lg font-semibold ${isHighlight ? 'text-green-800' : 'text-gray-900'}`}>
+        {value.toFixed(2)}{isPercentage ? '%' : ''}
+      </div>
+    </div>
+  );
 
-        // Global variables provided by the environment
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="bg-white rounded-lg shadow-lg p-8">
+          <div className="flex items-center gap-3 mb-6">
+            <Calculator className="w-8 h-8 text-blue-600" />
+            <h1 className="text-3xl font-bold text-gray-800">Sprint Capacity Planner</h1>
+          </div>
 
-        let db, auth;
-        let isAuthReady = false;
-        let debounceTimer;
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Input Section */}
+            <div className="space-y-2">
+              <h2 className="text-xl font-semibold text-gray-700 mb-4">Input Values</h2>
+              
+              <InputField
+                label="Rolling avg SPs"
+                value={rollingSPs}
+                onChange={setRollingSPs}
+              />
+              
+              <InputField
+                label="Working hours per week"
+                value={workingHoursPerWeek}
+                onChange={setWorkingHoursPerWeek}
+              />
+              
+              <InputField
+                label="Weeks per sprint"
+                value={weeksPerSprint}
+                onChange={setWeeksPerSprint}
+                step="1"
+              />
+              
+              <InputField
+                label="People working in sprint"
+                value={peopleWorking}
+                onChange={setPeopleWorking}
+                step="1"
+              />
 
-        // Helper function to safely parse input values
-        const parseValue = (id) => {
-            const element = document.getElementById(id);
-            return parseFloat(element.value) || 0;
-        };
+              <InputField
+                label="Working hours per day"
+                value={workingHoursPerDay}
+                onChange={setWorkingHoursPerDay}
+              />
+              
+              <InputField
+                label="Total absence days"
+                value={absenceDays}
+                onChange={setAbsenceDays}
+                step="0.5"
+              />
+              
+              <InputField
+                label="Buffer (%)"
+                value={buffer}
+                onChange={setBuffer}
+              />
+            </div>
 
-        // Helper function for safe division
-        const safeDivide = (numerator, denominator) => {
-            return denominator === 0 ? 0 : numerator / denominator;
-        };
-
-        // --- Core Calculation Logic ---
-        function calculateCapacity() {
-            // --- 1. Get Inputs ---
-            const workingHoursPerWeek = parseValue('inputHoursPerWeek');
-            const weeksPerSprint = parseValue('inputWeeksPerSprint');
-            const peopleInSprint = parseValue('inputPeople');
-            const absenceHours = parseValue('inputAbsence');
-            const bufferPercentage = parseValue('inputBuffer') / 100; 
-            const rollingAvgSPs = parseValue('inputRollingSPs');
-
-            // --- 2. Calculate Intermediate Protected Values ---
-            
-            // Hours per sprint (Total)
-            const hoursPerSprint = workingHoursPerWeek * weeksPerSprint;
-            document.getElementById('outputHoursPerSprint').value = hoursPerSprint.toFixed(1) + ' hrs';
-
-            // Hours of 100% capacity BE
-            const fullCapacityHours = hoursPerSprint * peopleInSprint;
-            document.getElementById('outputFullCapacity').value = fullCapacityHours.toFixed(1) + ' hrs';
-
-            // Actual hours per sprint BE
-            const actualHours = fullCapacityHours - absenceHours;
-            document.getElementById('outputActualHours').value = actualHours.toFixed(1) + ' hrs';
-
-            // Capacity excluding absences
-            const capacityExcludingAbsence = safeDivide(actualHours, fullCapacityHours);
-            document.getElementById('outputCapacityExcludingAbsence').value = (capacityExcludingAbsence * 100).toFixed(2) + '%';
-
-            // SP capacity excluding absences and buffer
-            const spCapacityExcludingBuffer = capacityExcludingAbsence * (1 - bufferPercentage);
-            document.getElementById('outputSPCapacity').value = (spCapacityExcludingBuffer * 100).toFixed(2) + '%';
-            
-            // --- 3. Calculate Final Protected Value ---
-
-            // Actual SPs per sprint (The estimated outcome)
-            const actualSPs = spCapacityExcludingBuffer * rollingAvgSPs;
-            document.getElementById('outputActualSPs').value = actualSPs.toFixed(2) + ' SPs';
-        }
-
-        // --- Firestore Save Logic (Debounced) ---
-        const saveStateToFirestore = () => {
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(async () => {
-                // Ensure auth is ready and db instance exists before saving
-                if (!isAuthReady || !db) return;
-
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'capacity_state', 'main_state');
-                
-                const state = {
-                    inputRollingSPs: parseValue('inputRollingSPs'),
-                    inputHoursPerWeek: parseValue('inputHoursPerWeek'),
-                    inputWeeksPerSprint: parseValue('inputWeeksPerSprint'),
-                    inputPeople: parseValue('inputPeople'),
-                    inputAbsence: parseValue('inputAbsence'),
-                    inputBuffer: parseValue('inputBuffer'),
-                    updatedBy: 'Someone', // Hardcoded anonymous identifier
-                    timestamp: new Date().toISOString()
-                };
-
-                try {
-                    await setDoc(docRef, state);
-                } catch (e) {
-                    console.error("Error saving document: ", e);
-                }
-            }, 500); // Wait 500ms after last input before writing to the database
-        };
-
-        // --- Firestore Load and Listen Logic ---
-        function loadAndListenForChanges() {
-            if (!isAuthReady || !db) return;
-
-            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'capacity_state', 'main_state');
-            
-            // Set up real-time listener
-            onSnapshot(docRef, (docSnapshot) => {
-                if (docSnapshot.exists()) {
-                    const data = docSnapshot.data();
-
-                    // Update input fields only if the value differs from current UI value
-                    // This prevents the UI from overwriting a value being actively typed by the user
-                    
-                    if (document.getElementById('inputRollingSPs').value != data.inputRollingSPs)
-                        document.getElementById('inputRollingSPs').value = data.inputRollingSPs;
-                    
-                    if (document.getElementById('inputHoursPerWeek').value != data.inputHoursPerWeek)
-                        document.getElementById('inputHoursPerWeek').value = data.inputHoursPerWeek;
-                    
-                    if (document.getElementById('inputWeeksPerSprint').value != data.inputWeeksPerSprint)
-                        document.getElementById('inputWeeksPerSprint').value = data.inputWeeksPerSprint;
-
-                    if (document.getElementById('inputPeople').value != data.inputPeople)
-                        document.getElementById('inputPeople').value = data.inputPeople;
-                    
-                    if (document.getElementById('inputAbsence').value != data.inputAbsence)
-                        document.getElementById('inputAbsence').value = data.inputAbsence;
-                    
-                    if (document.getElementById('inputBuffer').value != data.inputBuffer)
-                        document.getElementById('inputBuffer').value = data.inputBuffer;
-                    
-                    // Recalculate and update outputs
-                    calculateCapacity();
-                    
-                    // Display last update info, always showing "Someone"
-                    if(data.timestamp) {
-                        const date = new Date(data.timestamp).toLocaleTimeString();
-                        document.getElementById('last-update').innerHTML = `Last updated by <span class="font-semibold">Someone</span> at ${date}`;
-                    }
-
-                } else {
-                    // If document doesn't exist, use current defaults and save them to initialize
-                    calculateCapacity();
-                    saveStateToFirestore();
-                }
-            }, (error) => {
-                console.error("Error listening to Firestore changes:", error);
-            });
-        }
-
-        // --- Initialization ---
-        document.addEventListener('DOMContentLoaded', async () => {
-            // 1. Initialize Firebase
-            try {
-                // setLogLevel('Debug'); // Uncomment for debugging
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-
-                // 2. Authentication
-                // Anonymous sign-in is used to satisfy Firebase security rules for public write access
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
-                
-                // 3. Auth State Listener
-                onAuthStateChanged(auth, (user) => {
-                    isAuthReady = true;
-                    if (user) {
-                        loadAndListenForChanges(); // Start listening for shared data
-                    } else {
-                        console.log("No user signed in. Running in read-only mode.");
-                        calculateCapacity(); 
-                    }
-                });
-                
-            } catch (error) {
-                console.error("Firebase initialization or authentication failed:", error);
-                // Calculate using defaults if Firebase fails completely
-                calculateCapacity(); 
-            }
-
-            // 4. Attach Event Listeners to inputs to trigger SAVE
-            const inputElements = document.querySelectorAll('#input-section input');
-            inputElements.forEach(input => {
-                input.addEventListener('input', saveStateToFirestore);
-            });
-            
-        });
-    </script>
-</body>
-</html>
+            {/* Results Section */}
+            <div>
+              <h2 className="text-xl font-semibold text-gray-700 mb-4">Calculated Values</h2>
+              
+              <ResultField
+                label="Hours per sprint"
+                value={hoursPerSprint}
+              />
+              
+              <ResultField
+                label="Hours of 100% capacity"
+                value={hoursOf100Capacity}
+              />
+              
+              <ResultField
+                label="Hours of absence total"
+                value={hoursOfAbsence}
+              />
+              
+              <ResultField
+                label="Actual hours per sprint"
+                value={actualHoursPerSprint}
+              />
+              
+              <ResultField
+                label="Capacity excluding absences"
+                value={capacityExcludingAbsences}
+                isPercentage={true}
+              />
+              
+              <ResultField
+                label="Buffer substracted"
+                value={bufferSubstracted * 100}
+                isPercentage={true}
+              />
+              
+              <ResultField
+                label="Actual SPs per sprint"
+                value={actualSPsPerSprint}
+                isHighlight={true}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
