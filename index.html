@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Collaborative Sprint Capacity Planner</title>
+    <title>Sprint Capacity Planner</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Custom font and base styles */
@@ -38,8 +38,8 @@
 <body class="p-4 md:p-8 min-h-screen flex items-center justify-center">
 
     <div class="w-full max-w-2xl bg-gray-800 p-6 rounded-xl shadow-2xl">
-        <h1 class="text-3xl font-extrabold text-white mb-2 tracking-tight">BE Sprint Capacity Planner (Shared)</h1>
-        <p class="text-gray-400 mb-4">Enter your variables below. Everyone using this app sees the same, real-time values.</p>
+        <h1 class="text-3xl font-extrabold text-white mb-2 tracking-tight">Sprint capacity planner</h1>
+        <p class="text-gray-400 mb-4">Enter your variables below to calculate the Story Points for the Sprint</p>
         
         <!-- Container for Input Fields (Editable) -->
         <div id="input-section" class="mb-8 border-b border-gray-700 pb-4">
@@ -47,12 +47,6 @@
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 
-                <!-- Rolling AVG SPs -->
-                <div class="flex flex-col">
-                    <label for="inputRollingSPs" class="text-sm font-medium text-gray-300 mb-1">Rolling AVG SPs (Past Velocity)</label>
-                    <input type="number" id="inputRollingSPs" value="22" class="editable-field p-3 rounded-lg focus:ring-sky-500 focus:border-sky-500" min="0" step="0.1">
-                </div>
-
                 <!-- Working hours per week -->
                 <div class="flex flex-col">
                     <label for="inputHoursPerWeek" class="text-sm font-medium text-gray-300 mb-1">Working hours per week</label>
@@ -81,6 +75,12 @@
                 <div class="flex flex-col">
                     <label for="inputBuffer" class="text-sm font-medium text-gray-300 mb-1">Buffer (SRs, Bugs, Unforeseen) - %</label>
                     <input type="number" id="inputBuffer" value="20" class="editable-field p-3 rounded-lg focus:ring-sky-500 focus:border-sky-500" min="0" max="100" step="1">
+                </div>
+
+                 <!-- Rolling AVG SPs -->
+                <div class="flex flex-col">
+                    <label for="inputRollingSPs" class="text-sm font-medium text-gray-300 mb-1">Rolling AVG SPs (Past Velocity)</label>
+                    <input type="number" id="inputRollingSPs" value="22" class="editable-field p-3 rounded-lg focus:ring-sky-500 focus:border-sky-500" min="0" step="0.1">
                 </div>
             </div>
         </div>
