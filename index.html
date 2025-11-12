@@ -1,153 +1,191 @@
-import React, { useState } from 'react';
-import { Calculator } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprint Capacity Planner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom font and base styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f7f9; /* Light background */
+        }
+        /* Custom styling for read-only fields (Results) */
+        .result-field {
+            background-color: #f0f4f8; 
+            border: 1px solid #e2e8f0;
+        }
+        /* Highlight styling for the final result */
+        .highlight-field {
+            background-color: #4f46e5; /* Indigo */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.4), 0 2px 4px -2px rgba(79, 70, 229, 0.4);
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 lg:p-8 min-h-screen flex items-center justify-center">
 
-export default function SprintCapacityPlanner() {
-  const [rollingSPs, setRollingSPs] = useState('22.29');
-  const [workingHoursPerWeek, setWorkingHoursPerWeek] = useState('38.5');
-  const [weeksPerSprint, setWeeksPerSprint] = useState('2');
-  const [peopleWorking, setPeopleWorking] = useState('5');
-  const [workingHoursPerDay, setWorkingHoursPerDay] = useState('7.7');
-  const [absenceDays, setAbsenceDays] = useState('5');
-  const [buffer, setBuffer] = useState('20');
-
-  // Calculations based on formulas
-  const hoursPerSprint = parseFloat(workingHoursPerWeek) * parseFloat(weeksPerSprint);
-  const hoursOf100Capacity = hoursPerSprint * parseFloat(peopleWorking);
-  const hoursOfAbsence = parseFloat(absenceDays) * parseFloat(workingHoursPerDay);
-  const actualHoursPerSprint = hoursOf100Capacity - hoursOfAbsence;
-  const capacityExcludingAbsences = (actualHoursPerSprint / hoursOf100Capacity) * 100;
-  const bufferSubstracted = (100 - parseFloat(buffer)) / 100;
-  const actualSPsPerSprint = parseFloat(rollingSPs) * (capacityExcludingAbsences / 100) * bufferSubstracted;
-
-  const InputField = ({ label, value, onChange, step = "0.1" }) => (
-    <div className="mb-4">
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        {label}
-      </label>
-      <input
-        type="number"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        step={step}
-        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
-    </div>
-  );
-
-  const ResultField = ({ label, value, isPercentage = false, isHighlight = false }) => (
-    <div className={`mb-3 p-3 rounded ${isHighlight ? 'bg-green-100 border-2 border-green-600' : 'bg-gray-50'}`}>
-      <div className="text-sm text-gray-600">{label}</div>
-      <div className={`text-lg font-semibold ${isHighlight ? 'text-green-800' : 'text-gray-900'}`}>
-        {value.toFixed(2)}{isPercentage ? '%' : ''}
-      </div>
-    </div>
-  );
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <div className="flex items-center gap-3 mb-6">
-            <Calculator className="w-8 h-8 text-blue-600" />
-            <h1 className="text-3xl font-bold text-gray-800">Sprint Capacity Planner</h1>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Input Section */}
-            <div className="space-y-2">
-              <h2 className="text-xl font-semibold text-gray-700 mb-4">Input Values</h2>
-              
-              <InputField
-                label="Rolling avg SPs"
-                value={rollingSPs}
-                onChange={setRollingSPs}
-              />
-              
-              <InputField
-                label="Working hours per week"
-                value={workingHoursPerWeek}
-                onChange={setWorkingHoursPerWeek}
-              />
-              
-              <InputField
-                label="Weeks per sprint"
-                value={weeksPerSprint}
-                onChange={setWeeksPerSprint}
-                step="1"
-              />
-              
-              <InputField
-                label="People working in sprint"
-                value={peopleWorking}
-                onChange={setPeopleWorking}
-                step="1"
-              />
-
-              <InputField
-                label="Working hours per day"
-                value={workingHoursPerDay}
-                onChange={setWorkingHoursPerDay}
-              />
-              
-              <InputField
-                label="Total absence days"
-                value={absenceDays}
-                onChange={setAbsenceDays}
-                step="0.5"
-              />
-              
-              <InputField
-                label="Buffer (%)"
-                value={buffer}
-                onChange={setBuffer}
-              />
-            </div>
-
-            {/* Results Section */}
-            <div>
-              <h2 className="text-xl font-semibold text-gray-700 mb-4">Calculated Values</h2>
-              
-              <ResultField
-                label="Hours per sprint"
-                value={hoursPerSprint}
-              />
-              
-              <ResultField
-                label="Hours of 100% capacity"
-                value={hoursOf100Capacity}
-              />
-              
-              <ResultField
-                label="Hours of absence total"
-                value={hoursOfAbsence}
-              />
-              
-              <ResultField
-                label="Actual hours per sprint"
-                value={actualHoursPerSprint}
-              />
-              
-              <ResultField
-                label="Capacity excluding absences"
-                value={capacityExcludingAbsences}
-                isPercentage={true}
-              />
-              
-              <ResultField
-                label="Buffer substracted"
-                value={bufferSubstracted * 100}
-                isPercentage={true}
-              />
-              
-              <ResultField
-                label="Actual SPs per sprint"
-                value={actualSPsPerSprint}
-                isHighlight={true}
-              />
-            </div>
-          </div>
+    <!-- Container wurde auf max-w-sm reduziert, um die Sidebar besser zu simulieren -->
+    <div class="w-full max-w-sm bg-white rounded-2xl shadow-2xl p-6 sm:p-10">
+        
+        <!-- Header ohne Icon -->
+        <div class="flex items-center mb-8 border-b pb-4">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-800 tracking-tight">Sprint Capacity Planner</h1>
         </div>
-      </div>
+
+        <!-- Layout wurde auf EINE Spalte (grid-cols-1) umgestellt, um Stapelung zu erzwingen -->
+        <div class="grid grid-cols-1 gap-y-6">
+            
+            <!-- INPUT SECTION -->
+            <div id="input-section" class="space-y-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                <h2 class="text-xl font-bold text-gray-700 mb-4 border-b pb-2">Variables (Editable)</h2>
+                
+                <div class="flex flex-col">
+                    <label for="inputRollingSPs" class="text-sm font-medium text-gray-700 mb-1">Rolling AVG SPs (Past Velocity)</label>
+                    <input type="number" id="inputRollingSPs" value="22.29" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150">
+                </div>
+
+                <div class="flex flex-col">
+                    <label for="inputHoursPerWeek" class="text-sm font-medium text-gray-700 mb-1">Working hours per week</label>
+                    <input type="number" id="inputHoursPerWeek" value="38.5" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150">
+                </div>
+                
+                <div class="flex flex-col">
+                    <label for="inputWeeksPerSprint" class="text-sm font-medium text-gray-700 mb-1">Weeks per sprint</label>
+                    <input type="number" id="inputWeeksPerSprint" value="2" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150">
+                </div>
+                
+                <div class="flex flex-col">
+                    <label for="inputPeopleWorking" class="text-sm font-medium text-gray-700 mb-1">People working in sprint</label>
+                    <input type="number" id="inputPeopleWorking" value="5" step="1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150">
+                </div>
+
+                <div class="flex flex-col">
+                    <label for="inputHoursPerDay" class="text-sm font-medium text-gray-700 mb-1">Working hours per day</label>
+                    <input type="number" id="inputHoursPerDay" value="7.7" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150">
+                </div>
+                
+                <div class="flex flex-col">
+                    <label for="inputAbsenceDays" class="text-sm font-medium text-gray-700 mb-1">Total absence days</label>
+                    <input type="number" id="inputAbsenceDays" value="5" step="0.5" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150">
+                </div>
+                
+                <div class="flex flex-col">
+                    <label for="inputBuffer" class="text-sm font-medium text-gray-700 mb-1">Buffer (%) (SRs, Bugs, etc.)</label>
+                    <input type="number" id="inputBuffer" value="20" step="1" min="0" max="100" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150">
+                </div>
+            </div>
+
+            <!-- RESULTS SECTION -->
+            <div id="results-section" class="space-y-4">
+                <h2 class="text-xl font-bold text-gray-700 mb-4 border-b pb-2">Results (Protected)</h2>
+                
+                <div class="p-4 rounded-xl result-field">
+                    <div class="text-sm text-gray-500">Hours per sprint (Total)</div>
+                    <div id="outputHoursPerSprint" class="text-xl font-bold tracking-tight text-gray-800"></div>
+                </div>
+
+                <div class="p-4 rounded-xl result-field">
+                    <div class="text-sm text-gray-500">Hours of 100% capacity</div>
+                    <div id="outputHoursOf100Capacity" class="text-xl font-bold tracking-tight text-gray-800"></div>
+                </div>
+                
+                <div class="p-4 rounded-xl result-field">
+                    <div class="text-sm text-gray-500">Hours of absence total</div>
+                    <div id="outputHoursOfAbsence" class="text-xl font-bold tracking-tight text-gray-800"></div>
+                </div>
+                
+                <div class="p-4 rounded-xl result-field">
+                    <div class="text-sm text-gray-500">Actual hours per sprint</div>
+                    <div id="outputActualHoursPerSprint" class="text-xl font-bold tracking-tight text-gray-800"></div>
+                </div>
+                
+                <div class="p-4 rounded-xl result-field">
+                    <div class="text-sm text-gray-500">Capacity excluding absences</div>
+                    <div id="outputCapacityExcludingAbsences" class="text-xl font-bold tracking-tight text-gray-800"></div>
+                </div>
+                
+                <div class="p-4 rounded-xl result-field">
+                    <div class="text-sm text-gray-500">Effective Capacity Multiplier (100% - Buffer)</div>
+                    <div id="outputBufferSubstracted" class="text-xl font-bold tracking-tight text-gray-800"></div>
+                </div>
+                
+                <div class="p-4 rounded-xl highlight-field">
+                    <div class="text-sm text-indigo-200">Actual SPs per sprint</div>
+                    <div id="outputActualSPsPerSprint" class="text-2xl font-extrabold tracking-tight text-white"></div>
+                </div>
+
+            </div>
+        </div>
     </div>
-  );
-}
+
+    <script>
+        // Helper function to safely parse string state to float, defaulting to 0
+        const safeParseFloat = (id) => {
+            const element = document.getElementById(id);
+            const parsed = parseFloat(element.value);
+            return isNaN(parsed) ? 0 : parsed;
+        };
+
+        const safeDivide = (numerator, denominator) => {
+            return denominator === 0 ? 0 : numerator / denominator;
+        };
+
+        function calculateCapacity() {
+            // --- 1. Get Inputs (IDs match the HTML fields) ---
+            const rSPs = safeParseFloat('inputRollingSPs');
+            const wHPW = safeParseFloat('inputHoursPerWeek');
+            const wPS = safeParseFloat('inputWeeksPerSprint');
+            const pW = safeParseFloat('inputPeopleWorking');
+            const wHPD = safeParseFloat('inputHoursPerDay');
+            const aD = safeParseFloat('inputAbsenceDays');
+            const b = safeParseFloat('inputBuffer');
+
+            // --- 2. Calculations (Based on React Logic) ---
+            
+            // 1. Hours per sprint (Total team hours per sprint)
+            const hoursPerSprint = wHPW * wPS;
+            
+            // 2. Hours of 100% capacity
+            const hoursOf100Capacity = hoursPerSprint * pW;
+            
+            // 3. Hours of absence total
+            const hoursOfAbsence = aD * wHPD;
+            
+            // 4. Actual hours per sprint (Capacity - Absence)
+            const actualHoursPerSprint = hoursOf100Capacity - hoursOfAbsence;
+            
+            // 5. Capacity excluding absences (%)
+            const capacityExcludingAbsences = safeDivide(actualHoursPerSprint, hoursOf100Capacity) * 100;
+
+            // 6. Buffer multiplier
+            const bufferSubstracted = safeDivide((100 - b), 100);
+            
+            // 7. Actual SPs per sprint (The estimated outcome)
+            const actualSPsPerSprint = rSPs * safeDivide(capacityExcludingAbsences, 100) * bufferSubstracted;
+
+            // --- 3. Update Results in UI ---
+            document.getElementById('outputHoursPerSprint').textContent = hoursPerSprint.toFixed(2) + ' hrs';
+            document.getElementById('outputHoursOf100Capacity').textContent = hoursOf100Capacity.toFixed(2) + ' hrs';
+            document.getElementById('outputHoursOfAbsence').textContent = hoursOfAbsence.toFixed(2) + ' hrs';
+            document.getElementById('outputActualHoursPerSprint').textContent = actualHoursPerSprint.toFixed(2) + ' hrs';
+            document.getElementById('outputCapacityExcludingAbsences').textContent = capacityExcludingAbsences.toFixed(2) + '%';
+            document.getElementById('outputBufferSubstracted').textContent = (bufferSubstracted * 100).toFixed(2) + '%';
+            document.getElementById('outputActualSPsPerSprint').textContent = actualSPsPerSprint.toFixed(2);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputElements = document.querySelectorAll('#input-section input');
+            
+            // Attach the calculation function to every input event
+            inputElements.forEach(input => {
+                input.addEventListener('input', calculateCapacity);
+            });
+
+            // Run initial calculation when the page loads
+            calculateCapacity();
+        });
+    </script>
+</body>
+</html>
